@@ -1,0 +1,29 @@
+name: bbs-spring-boot-api
+
+services:
+  postgres:
+    image: 'postgres:16'
+    container_name: 'postgres'
+    environment:
+      - 'POSTGRES_DB=bbs'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=java'
+      - 'TZ=Asia/Tokyo'
+    ports:
+      - '15432:5432'
+    volumes:
+      - 'bbs-spring-boot-api-data:/var/lib/postgresql/data'
+      - './docs/database/data:/docker-entrypoint-initdb.d'
+
+  swagger-ui:
+    image: 'swaggerapi/swagger-ui'
+    container_name: "swagger-ui"
+    ports:
+      - "8002:8080"
+    volumes:
+      - './docs/api/openapi.yaml:/openapi.yaml'
+    environment:
+      SWAGGER_JSON: '/openapi.yaml'
+
+volumes:
+  bbs-spring-boot-api-data:

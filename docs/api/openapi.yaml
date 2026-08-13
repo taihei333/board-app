@@ -1,0 +1,191 @@
+openapi: 3.0.3
+
+info:
+  title: 掲示板API
+  description:  |
+    ## 掲示板のCRUDを行うAPI
+    ### 機能
+      1. ログイン
+      2. ログインユーザー情報取得
+      3. 記事一覧取得：ページネーション・検索
+      4. 記事登録
+      5. 記事詳細取得
+      6. 記事更新
+      7. 記事削除
+      8. コメント登録
+    ---
+    ※ログインAPI、ログインユーザー情報取得APIを参考に残りのAPI設計をしてください。
+  version: 1.0.0
+
+servers:
+  - url: 'http://localhost:{port}/api/{version}'
+    description: 開発環境サーバー
+    variables:
+      port:
+        enum:
+          - '8080'
+        default: '8080'
+      version:
+        enum:
+          - 'v1'
+        default: 'v1'
+
+paths:
+  /login:
+    post:
+      summary: ログイン
+      description: |
+        ログインしてJWTトークンを取得する
+        ### 一般ユーザー
+        - メールアドレス：user@example.com
+        - パスワード: password123
+        ### 管理者ユーザー
+        - メールアドレス：admin@example.com
+        - パスワード: password123
+      tags:
+        - login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+              example:
+                email: user@example.com
+                password: password123
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzU0NDQ2MjE5LCJleHAiOjE3NTQ1MzI2MTl9.bShS5MTrU0iuULlmF2fJ-lTzInoF-9kJ14Fxmu2wQJE5F4xP_Z0r6cvLVkMxhFNe5e43agUtXzdrVBpuw7YrEQ
+                  type:
+                    type: string
+                    example: Bearer
+                  id:
+                    type: integer
+                    example: 1
+                  email:
+                    type: string
+                    example: user@example.com
+        400:
+          $ref: '#/components/responses/400-BadRequest'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
+
+  /me:
+    get:
+      summary: ログインユーザー情報取得
+      description: JWT認証済みユーザーのnameとemailを返す
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: user
+                  email:
+                    type: string
+                    example: user@example.com
+        401:
+          $ref: '#/components/responses/401-Unauthorized'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
+
+
+components:
+  responses:
+    400-BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 入力内容にエラーがあります
+              field_errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                      example: email
+                    message:
+                      type: string
+                      example: Email is required
+    401-Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Unauthorized
+            required:
+              - message
+    403-Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Forbidden
+            required:
+              - message
+    404-NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Not Found
+            required:
+              - message
+    500-InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Internal Server Error
+            required:
+              - message
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

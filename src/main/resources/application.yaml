@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:15432/bbs
+    username: java
+    password: secret
+    driver-class-name: org.postgresql.Driver
+
+  # https://tech.excite.co.jp/entry/2024/12/09/110757
+  docker:
+    compose:
+      stop:
+        command: down
+      start:
+        log-level: debug
