@@ -112,6 +112,407 @@ paths:
         500:
           $ref: '#/components/responses/500-InternalServerError'
 
+  /articles:
+    get:
+      summary: 記事一覧取得
+      description: ページネーション・検索・ソート機能付きで記事一覧を取得する
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: ページ番号（1始まり）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: 1ページあたりの件数
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: title
+          in: query
+          description: タイトルの部分一致検索
+          required: false
+          schema:
+            type: string
+        - name: content
+          in: query
+          description: 本文の部分一致検索
+          required: false
+          schema:
+            type: string
+        - name: authorName
+          in: query
+          description: 投稿者名の部分一致検索
+          required: false
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: ソート対象カラム
+          required: false
+          schema:
+            type: string
+            enum: [createdAt, title]
+            default: createdAt
+        - name: order
+          in: query
+          description: ソート順
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 101
+                        title:
+                          type: string
+                          example: 初めての投稿です
+                        authorName:
+                          type: string
+                          example: 山田太郎
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2026-08-01T10:15:00+09:00"
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      size:
+                        type: integer
+                        example: 20
+                      totalElements:
+                        type: integer
+                        example: 42
+                      totalPages:
+                        type: integer
+                        example: 3
+        400:
+          $ref: '#/components/responses/400-BadRequest'
+        401:
+          $ref: '#/components/responses/401-Unauthorized'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
+
+    post:
+      summary: 記事登録
+      description: 新しい記事を登録する
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                content:
+                  type: string
+                  minLength: 1
+                  maxLength: 10000
+              required:
+                - title
+                - content
+              example:
+                title: 初めての投稿です
+                content: 本文の内容がここに入ります。
+      responses:
+        201:
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 101
+                  title:
+                    type: string
+                    example: 初めての投稿です
+                  content:
+                    type: string
+                    example: 本文の内容がここに入ります。
+                  authorId:
+                    type: integer
+                    example: 1
+                  authorName:
+                    type: string
+                    example: 山田太郎
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-08-01T10:15:00+09:00"
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2026-08-01T10:15:00+09:00"
+        400:
+          $ref: '#/components/responses/400-BadRequest'
+        401:
+          $ref: '#/components/responses/401-Unauthorized'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
+
+  /articles/{articleId}:
+    parameters:
+      - name: articleId
+        in: path
+        required: true
+        description: 記事ID
+        schema:
+          type: integer
+
+    get:
+      summary: 記事詳細取得
+      description: 指定されたIDの記事詳細と、紐づくコメント一覧を取得する
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 101
+                  title:
+                    type: string
+                    example: 初めての投稿です
+                  content:
+                    type: string
+                    example: 本文の内容がここに入ります。
+                  authorId:
+                    type: integer
+                    example: 1
+                  authorName:
+                    type: string
+                    example: 山田太郎
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-08-01T10:15:00+09:00"
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2026-08-01T10:15:00+09:00"
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 501
+                        authorId:
+                          type: integer
+                          example: 2
+                        authorName:
+                          type: string
+                          example: 佐藤花子
+                        content:
+                          type: string
+                          example: 参考になりました！
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2026-08-02T09:00:00+09:00"
+        401:
+          $ref: '#/components/responses/401-Unauthorized'
+        404:
+          $ref: '#/components/responses/404-NotFound'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
+
+    put:
+      summary: 記事更新
+      description: 指定されたIDの記事を更新する（投稿者本人のみ）
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                content:
+                  type: string
+                  minLength: 1
+                  maxLength: 10000
+              required:
+                - title
+                - content
+              example:
+                title: タイトルを更新しました
+                content: 本文を更新しました。
+      responses:
+        200:
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 101
+                  title:
+                    type: string
+                    example: タイトルを更新しました
+                  content:
+                    type: string
+                    example: 本文を更新しました。
+                  authorId:
+                    type: integer
+                    example: 1
+                  authorName:
+                    type: string
+                    example: 山田太郎
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-08-01T10:15:00+09:00"
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2026-08-03T12:00:00+09:00"
+        400:
+          $ref: '#/components/responses/400-BadRequest'
+        401:
+          $ref: '#/components/responses/401-Unauthorized'
+        403:
+          $ref: '#/components/responses/403-Forbidden'
+        404:
+          $ref: '#/components/responses/404-NotFound'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
+
+    delete:
+      summary: 記事削除
+      description: 指定されたIDの記事を削除する（投稿者本人のみ）
+      tags:
+        - article
+      security:
+        - bearerAuth: []
+      responses:
+        204:
+          description: 削除成功（レスポンスボディなし）
+        401:
+          $ref: '#/components/responses/401-Unauthorized'
+        403:
+          $ref: '#/components/responses/403-Forbidden'
+        404:
+          $ref: '#/components/responses/404-NotFound'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
+
+  /articles/{articleId}/comments:
+    parameters:
+      - name: articleId
+        in: path
+        required: true
+        description: コメント対象の記事ID
+        schema:
+          type: integer
+
+    post:
+      summary: コメント登録
+      description: 指定された記事にコメントを登録する
+      tags:
+        - comment
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  minLength: 1
+                  maxLength: 1000
+              required:
+                - content
+              example:
+                content: 参考になりました！
+      responses:
+        201:
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 501
+                  articleId:
+                    type: integer
+                    example: 101
+                  authorId:
+                    type: integer
+                    example: 2
+                  authorName:
+                    type: string
+                    example: 佐藤花子
+                  content:
+                    type: string
+                    example: 参考になりました！
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-08-02T09:00:00+09:00"
+        400:
+          $ref: '#/components/responses/400-BadRequest'
+        401:
+          $ref: '#/components/responses/401-Unauthorized'
+        404:
+          $ref: '#/components/responses/404-NotFound'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
 
 components:
   responses:
@@ -188,4 +589,4 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
+      bearerFormat: JWT？

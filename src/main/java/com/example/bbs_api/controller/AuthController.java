@@ -2,6 +2,7 @@ package com.example.bbs_api.controller;
 
 import com.example.bbs_api.dto.JwtResponse;
 import com.example.bbs_api.dto.LoginRequest;
+import com.example.bbs_api.dto.UserResponse;
 import com.example.bbs_api.entity.User;
 import com.example.bbs_api.exception.ErrorResponse;
 import com.example.bbs_api.util.JwtUtil;
@@ -70,5 +71,20 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new ErrorResponse("Error: Internal Server Error"));
         }
+    }
+
+    /**
+     * ログイン中のユーザー情報を取得するエンドポイント。
+     * <p>
+     * JWT認証フィルターによってセットされた認証情報から、
+     * 現在ログイン中のユーザーのname・emailを返却する。
+     *
+     * @param authentication JWT認証フィルターがセットした認証情報
+     * @return ログインユーザーのname・emailを含むレスポンス
+     */
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(new UserResponse(user.getName(), user.getEmail()));
     }
 }
