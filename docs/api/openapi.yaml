@@ -6,13 +6,14 @@ info:
     ## 掲示板のCRUDを行うAPI
     ### 機能
       1. ログイン
-      2. ログインユーザー情報取得
-      3. 記事一覧取得：ページネーション・検索
-      4. 記事登録
-      5. 記事詳細取得
-      6. 記事更新
-      7. 記事削除
-      8. コメント登録
+      2. 会員登録
+      3. ログインユーザー情報取得
+      4. 記事一覧取得：ページネーション・検索
+      5. 記事登録
+      6. 記事詳細取得
+      7. 記事更新
+      8. 記事削除
+      9. コメント登録
     ---
     ※ログインAPI、ログインユーザー情報取得APIを参考に残りのAPI設計をしてください。
   version: 1.0.0
@@ -77,6 +78,64 @@ paths:
                   id:
                     type: integer
                     example: 1
+                  email:
+                    type: string
+                    example: user@example.com
+        400:
+          $ref: '#/components/responses/400-BadRequest'
+        500:
+          $ref: '#/components/responses/500-InternalServerError'
+
+  /signup:
+    post:
+      summary: 会員登録
+      description: |
+        新しいユーザーアカウントを登録する
+      tags:
+        - signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  maxLength: 255
+                name:
+                  type: string
+                  maxLength: 10
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+                  pattern: '^[a-zA-Z0-9]+$'
+                passwordConfirmation:
+                  type: string
+              required:
+                - email
+                - name
+                - password
+                - passwordConfirmation
+              example:
+                email: user@example.com
+                name: 山田太郎
+                password: password123
+                passwordConfirmation: password123
+      responses:
+        201:
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: 山田太郎
                   email:
                     type: string
                     example: user@example.com
