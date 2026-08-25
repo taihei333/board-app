@@ -83,6 +83,25 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 会員登録時にメールアドレスが既に登録済みの場合に呼び出されるハンドラー。
+     * <p>
+     * 400 Bad Requestでエラー詳細を返す。
+     *
+     * @param ex 発生したEmailAlreadyExistsException例外
+     * @return エラーレスポンスを含むResponseEntity
+     */
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsExceptions(EmailAlreadyExistsException ex) {
+
+        List<FieldErrorDetail> detailList = Collections.singletonList(new FieldErrorDetail("email", ex.getMessage()));
+
+        ErrorResponse errorResponse = new ErrorResponse("入力内容にエラーがあります。");
+        errorResponse.setFieldErrors(detailList);
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * 権限拒否（アクセス禁止）エラー発生時に呼び出されるハンドラー。
      * <p>
      * 403 Forbiddenステータスでエラーメッセージを返す。

@@ -139,7 +139,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v*/login", "/api/public").permitAll()
+                        .requestMatchers("/api/v*/login", "/api/v*/signup", "/api/public").permitAll()
                         .anyRequest().hasRole("USER"))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling((exceptions) -> {
