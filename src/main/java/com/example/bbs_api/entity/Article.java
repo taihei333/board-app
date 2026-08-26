@@ -44,6 +44,12 @@ public class Article {
     @PrePersist
     protected void onCreate() {
         this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = OffsetDateTime.now();
     }
 
     public Long getId() {
