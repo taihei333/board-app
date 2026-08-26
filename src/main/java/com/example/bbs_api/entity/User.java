@@ -77,7 +77,7 @@ public class User implements UserDetails {
     // UserDetails implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(() -> role);
+        return Collections.singletonList(() -> "ROLE_" + role);
     }
 
     @Override
