@@ -44,6 +44,7 @@ public class ArticleService {
      * @return 記事一覧とページネーション情報を含むレスポンス
      */
 
+    @Transactional(readOnly = true)
     public ArticleListResponse findArticles(
             int page, int size, String title, String content, String authorName,
             String sortBy, String order) {
@@ -112,6 +113,7 @@ public class ArticleService {
      * @return 記事詳細（コメント一覧を含む）
      * @throws ResourceNotFoundException 指定されたIDの記事が存在しない場合
      */
+    @Transactional(readOnly = true)
     public ArticleDetailResponse getArticleDetail(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Article not found: " + articleId));
