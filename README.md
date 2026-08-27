@@ -182,3 +182,5 @@ Postman に似ていますが、**より軽くて速いのが特徴**の Web ベ
 **参考リポジトリ**:
 過去の先輩たちのリポジトリです。参考にして自分の掲示板に実装してください。
 https://github.com/KIR-SHARE-ISSUES/2511-tomatsu-r-springboot-api-1
+
+EC2からのテスト編集
