@@ -13,6 +13,21 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: bbs
+          MYSQL_USER: bbs_test
+          MYSQL_PASSWORD: bbs_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,6 +42,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run tests
+        env:
+          SPRING_PROFILES_ACTIVE: production
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: bbs
+          DB_USERNAME: bbs_test
+          DB_PASSWORD: bbs_test
         run: ./gradlew test
 
       - name: Upload test results
