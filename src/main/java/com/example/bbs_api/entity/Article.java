@@ -24,7 +24,7 @@ public class Article {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User author;
 
     @Column(nullable = false, updatable = false)
@@ -32,6 +32,9 @@ public class Article {
 
     @Column(nullable = false)
     private OffsetDateTime updatedAt;
+
+    @Column(nullable = false)
+    private long viewCount = 0;
 
     public Article() {}
 
@@ -90,5 +93,13 @@ public class Article {
 
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public long getViewCount() {
+        return viewCount;
+    }
+
+    public void incrementViewCount() {
+        this.viewCount++;
     }
 }
